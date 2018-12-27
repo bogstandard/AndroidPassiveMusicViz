@@ -1,0 +1,76 @@
+<?xml version="1.0" encoding="utf-8"?>
+<android.support.constraint.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:theme="@android:style/Theme.Black.NoTitleBar.Fullscreen"
+    tools:context=".MainActivity">
+
+    <ImageView
+        android:id="@+id/myimageview"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"/>
+
+    <android.support.constraint.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+        xmlns:app="http://schemas.android.com/apk/res-auto"
+        xmlns:tools="http://schemas.android.com/tools"
+        android:id="@+id/myOptionsLayout"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:background="@color/colorOptionsBackground"
+        android:theme="@android:style/Theme.Black.NoTitleBar.Fullscreen"
+        android:visibility="gone"
+        tools:context=".MainActivity">
+
+        <TextView
+            android:id="@+id/textView"
+            android:layout_width="match_parent"
+            android:layout_height="121dp"
+            android:gravity="center"
+            android:text="@string/options_page_header"
+            android:textColor="@color/colorAccent"
+            android:textSize="22dp" />
+
+        <TableRow
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:gravity="center_vertical|center_horizontal"
+            >
+
+            <Button
+                android:id="@+id/buttonChainPos0"
+                android:layout_width="157dp"
+                android:layout_height="117dp"
+                android:layout_marginRight="20dp"
+                android:background="@drawable/button_bg_stroke"
+                android:onClick="optionsButtonOnClick"
+                android:text="1"
+                android:textColor="@color/colorAccent"
+                android:textSize="32dp" />
+
+            <Button
+                android:id="@+id/buttonChainPos1"
+                android:layout_width="157dp"
+                android:layout_height="117dp"
+                android:layout_marginRight="20dp"
+                android:background="@drawable/button_bg_stroke"
+                android:onClick="optionsButtonOnClick"
+                android:text="2"
+                android:textColor="@color/colorAccent"
+                android:textSize="32dp" />
+
+            <Button
+                android:id="@+id/buttonChainPos2"
+                android:layout_width="157dp"
+                android:layout_height="117dp"
+                android:background="@drawable/button_bg_stroke"
+                android:onClick="optionsButtonOnClick"
+                android:text="3"
+                android:textColor="@color/colorAccent"
+                android:textSize="32dp" />
+        </TableRow>
+
+    </android.support.constraint.ConstraintLayout>
+
+</android.support.constraint.ConstraintLayout>
