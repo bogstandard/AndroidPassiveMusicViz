@@ -19,13 +19,16 @@ import android.widget.ImageView;
 import java.lang.Math;
 
 import java.io.IOException;
+import java.util.Arrays;
 
 public class MainActivity extends AppCompatActivity {
 
     private double MAX_AMPLITUDE = 32762; // from own testing & online reading, this is the max
                                           // but we'll cap it at this just to be safe.
 
-    private int AMPLITUDE_ARRAY_SIZE = 12;
+    private int AMPLITUDE_ARRAY_SIZE = 12 * 3; // we have a hardcoded cap of 3 phones to chain
+    private int AMPLITUDE_VISIBLE_SIZE = 12;
+    private int AMPLITUDE_VISIBLE_OFFSET = 0; // changes dependent on phone position
     final private int TICK_FREQUENCY_MS = 50;
 
 
@@ -49,8 +52,7 @@ public class MainActivity extends AppCompatActivity {
 
 
     private MediaRecorder readyMic(MediaRecorder mic) {
-        // VOICE_RECOGNITION allows for greater sensitivity
-        mic.setAudioSource(android.media.MediaRecorder.AudioSource.VOICE_RECOGNITION);
+        mic.setAudioSource(android.media.MediaRecorder.AudioSource.MIC);
         mic.setOutputFormat(MediaRecorder.OutputFormat.THREE_GPP);
         mic.setAudioEncoder(MediaRecorder.AudioEncoder.AAC_ELD); // greater sensitivity with ACC
         mic.setMaxDuration(5000);
@@ -70,10 +72,10 @@ public class MainActivity extends AppCompatActivity {
     public void drawAmplitudes(View view) {
 
         try {
+
             int vWidth = view.getWidth();
             int vHeight = view.getHeight();
             int halfHeight = vHeight / 2;
-
 
             // associate bitmap with canvas
             mBitmap = Bitmap.createBitmap(vWidth, vHeight, Bitmap.Config.ARGB_8888);
@@ -88,7 +90,7 @@ public class MainActivity extends AppCompatActivity {
             // draw circles
 
             // mColorAccent is an int, we can use bit magic to pluck the colour
-            int alpha = 100;
+            int alpha = 85;
             int r = (mColorAccent >> 16) & 0xFF;
             int g = (mColorAccent >> 8) & 0xFF;
             int b = (mColorAccent >> 0) & 0xFF;
@@ -100,15 +102,20 @@ public class MainActivity extends AppCompatActivity {
             mPaint.setAntiAlias(true);
             mPaint.setXfermode(new PorterDuffXfermode(Mode.ADD));
 
-            double maxRadius = vWidth / amplitudePercentages.length;
+            double maxRadius = vWidth / AMPLITUDE_VISIBLE_SIZE;
             double x = maxRadius;
 
             // less than full amount to fit on screen :)
-            for (int i = 0; i < amplitudePercentages.length - 1; i++) {
+
+            double[] visibleAmplitudePercentages = Arrays.copyOfRange(amplitudePercentages,
+                    0+(AMPLITUDE_VISIBLE_SIZE*AMPLITUDE_VISIBLE_OFFSET),
+                    AMPLITUDE_VISIBLE_SIZE+(AMPLITUDE_VISIBLE_SIZE*AMPLITUDE_VISIBLE_OFFSET));
+
+            for (int i = 0; i < visibleAmplitudePercentages.length - 1; i++) {
 
                 // radius with artificial wobble for recurring amp
                 // subtract rather than add so we don't add to silence!
-                double radius = ((maxRadius / 100) * amplitudePercentages[i]) - Math.floor(Math.random() * 10);
+                double radius = (((maxRadius + 100) / 100) * visibleAmplitudePercentages[i]) - Math.floor(Math.random() * 10);
 
                 mCanvas.drawCircle((int) x, halfHeight, (int) radius, mPaint);
 
@@ -130,15 +137,15 @@ public class MainActivity extends AppCompatActivity {
         switch(view.getId())
         {
             case R.id.buttonChainPos0:
-                multiplier = 1;
+                AMPLITUDE_VISIBLE_OFFSET = 0;
                 break;
 
             case R.id.buttonChainPos1:
-                multiplier = 2;
+                AMPLITUDE_VISIBLE_OFFSET = 1;
                 break;
 
             case R.id.buttonChainPos2:
-                multiplier = 3;
+                AMPLITUDE_VISIBLE_OFFSET = 2;
                 break;
         }
 
