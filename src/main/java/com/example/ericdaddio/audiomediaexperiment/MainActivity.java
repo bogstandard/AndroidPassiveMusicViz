@@ -25,6 +25,7 @@ public class MainActivity extends AppCompatActivity {
 
     private double MAX_AMPLITUDE = 32762; // from own testing & online reading, this is the max
                                           // but we'll cap it at this just to be safe.
+    private MediaRecorder mic;
 
     private int AMPLITUDE_ARRAY_SIZE = 12 * 3; // we have a hardcoded cap of 3 phones to chain
     private int AMPLITUDE_VISIBLE_SIZE = 12;
@@ -261,12 +262,15 @@ public class MainActivity extends AppCompatActivity {
         final Handler handler = new Handler();
         final int delay = TICK_FREQUENCY_MS; //milliseconds
 
-        final MediaRecorder mic = new MediaRecorder();
+        mic = new MediaRecorder();
+
         readyMic(mic);
         mic.start();   // Initial record start before we get into a loop
 
         handler.postDelayed(new Runnable(){
             public void run(){
+
+                if(mic == null) return;
 
                 try {
 
@@ -305,5 +309,13 @@ public class MainActivity extends AppCompatActivity {
             }
         }, delay);
 
+    }
+
+    @Override
+    protected void onDestroy() {
+        super.onDestroy();
+        mic.reset();
+        mic.release();
+        mic = null;
     }
 }
