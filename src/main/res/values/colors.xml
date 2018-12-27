@@ -4,6 +4,9 @@
     <color name="colorPrimaryDark">#000000</color>
     <color name="colorAccent">#FFFFFF</color>
 
+    <!-- For Help Text -->
+    <color name="colorHelp">#70FFFFFF</color>
+
     <!-- For Canvas -->
     <color name="colorBackground">#F60F60</color>
 

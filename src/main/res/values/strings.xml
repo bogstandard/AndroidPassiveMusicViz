@@ -1,5 +1,5 @@
 <resources>
     <string name="app_name">AudioMediaExperiment</string>
+    <string name="help">drag to change colours, two finger tap to chain device</string>
     <string name="options_page_header">tap where this phone is in the chain</string>
-
 </resources>

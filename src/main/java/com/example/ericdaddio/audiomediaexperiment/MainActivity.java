@@ -48,6 +48,7 @@ public class MainActivity extends AppCompatActivity {
     private int mColorAccent;
     private int mImageViewTapCount = 0;
 
+    private View mHelpText;
     private View mOptionsView;
 
 
@@ -162,13 +163,14 @@ public class MainActivity extends AppCompatActivity {
         setContentView(R.layout.activity_main);
 
         mOptionsView = findViewById(R.id.myOptionsLayout);
+        mHelpText = findViewById(R.id.myHelpText);
 
 
         /**
          * Begin canvas bootstrapping code
          */
 
-        mImageView = (ImageView) findViewById(R.id.myimageview);
+        mImageView = findViewById(R.id.myimageview);
 
         mColorBackground = ResourcesCompat.getColor(getResources(),
                 R.color.colorBackground, null);
@@ -185,6 +187,9 @@ public class MainActivity extends AppCompatActivity {
                     switch(action) {
 
                         case MotionEvent.ACTION_DOWN : {
+                            // animating layout changes means this doesn't flash when
+                            // the two-finger tap is performed
+                            mHelpText.setVisibility(View.VISIBLE);
                             ++mImageViewTapCount;
                             Log.d("M__", "MotionEvent.ACTION_DOWN "+mImageViewTapCount);
                             break;
@@ -201,6 +206,7 @@ public class MainActivity extends AppCompatActivity {
                         }
 
                         case MotionEvent.ACTION_UP : {
+                            mHelpText.setVisibility(View.GONE);
                             --mImageViewTapCount;
                             if(mImageViewTapCount == 2){
                                 mImageViewTapCount = 0;
