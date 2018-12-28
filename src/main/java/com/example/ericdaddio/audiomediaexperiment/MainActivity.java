@@ -1,6 +1,7 @@
 package com.example.ericdaddio.audiomediaexperiment;
 
 import android.annotation.SuppressLint;
+import android.content.SharedPreferences;
 import android.graphics.Bitmap;
 import android.graphics.Canvas;
 import android.graphics.Paint;
@@ -23,8 +24,13 @@ import java.util.Arrays;
 
 public class MainActivity extends AppCompatActivity {
 
+    public static final String PREFS_NAME = "PassiveAudioVizPrefs";
+    SharedPreferences sharedPreferences;
+    SharedPreferences.Editor sharedPreferencesEditor;
+
+
     private double MAX_AMPLITUDE = 32762; // from own testing & online reading, this is the max
-                                          // but we'll cap it at this just to be safe.
+    // but we'll cap it at this just to be safe.
     private MediaRecorder mic;
 
     private int AMPLITUDE_ARRAY_SIZE = 12 * 3; // we have a hardcoded cap of 3 phones to chain
@@ -62,8 +68,7 @@ public class MainActivity extends AppCompatActivity {
 
         try {
             mic.prepare();
-        }
-        catch (IOException ioExp) {
+        } catch (IOException ioExp) {
             Log.e("Mic Ready", "Could not prepare mic");
         }
 
@@ -110,8 +115,8 @@ public class MainActivity extends AppCompatActivity {
             // less than full amount to fit on screen :)
 
             double[] visibleAmplitudePercentages = Arrays.copyOfRange(amplitudePercentages,
-                    0+(AMPLITUDE_VISIBLE_SIZE*AMPLITUDE_VISIBLE_OFFSET),
-                    AMPLITUDE_VISIBLE_SIZE+(AMPLITUDE_VISIBLE_SIZE*AMPLITUDE_VISIBLE_OFFSET));
+                    0 + (AMPLITUDE_VISIBLE_SIZE * AMPLITUDE_VISIBLE_OFFSET),
+                    AMPLITUDE_VISIBLE_SIZE + (AMPLITUDE_VISIBLE_SIZE * AMPLITUDE_VISIBLE_OFFSET));
 
             for (int i = 0; i < visibleAmplitudePercentages.length - 1; i++) {
 
@@ -133,11 +138,9 @@ public class MainActivity extends AppCompatActivity {
 
     }
 
-    public void optionsButtonOnClick(View view)
-    {
+    public void optionsButtonOnClick(View view) {
         int multiplier;
-        switch(view.getId())
-        {
+        switch (view.getId()) {
             case R.id.buttonChainPos0:
                 AMPLITUDE_VISIBLE_OFFSET = 0;
                 break;
@@ -153,7 +156,6 @@ public class MainActivity extends AppCompatActivity {
 
         Log.i("Options", "Button clicked.");
         mOptionsView.setVisibility(View.GONE);
-
     }
 
 
@@ -161,6 +163,10 @@ public class MainActivity extends AppCompatActivity {
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+
+        sharedPreferences = getApplicationContext().getSharedPreferences(PREFS_NAME, MODE_PRIVATE);
+        sharedPreferencesEditor = sharedPreferences.edit();
+
         setContentView(R.layout.activity_main);
 
         mOptionsView = findViewById(R.id.myOptionsLayout);
@@ -178,77 +184,82 @@ public class MainActivity extends AppCompatActivity {
         mColorAccent = ResourcesCompat.getColor(getResources(),
                 R.color.colorAccent, null);
 
+        restorePreferences();
+
         mImageView.setOnTouchListener(new View.OnTouchListener() {
             @Override
             public boolean onTouch(View view, MotionEvent event) {
 
-                    int action = event.getAction() & MotionEvent.ACTION_MASK;
+                int action = event.getAction() & MotionEvent.ACTION_MASK;
 
-                    // thanks https://stackoverflow.com/a/43362330
-                    switch(action) {
+                // thanks https://stackoverflow.com/a/43362330
+                switch (action) {
 
-                        case MotionEvent.ACTION_DOWN : {
-                            // animating layout changes means this doesn't flash when
-                            // the two-finger tap is performed
-                            mHelpText.setVisibility(View.VISIBLE);
-                            ++mImageViewTapCount;
-                            Log.d("M__", "MotionEvent.ACTION_DOWN "+mImageViewTapCount);
-                            break;
-                        }
-
-                        case MotionEvent.ACTION_POINTER_DOWN : {
-                            ++mImageViewTapCount;
-                            break;
-                        }
-
-                        case MotionEvent.ACTION_POINTER_UP : {
-                            ++mImageViewTapCount;
-                            break;
-                        }
-
-                        case MotionEvent.ACTION_UP : {
-                            mHelpText.setVisibility(View.GONE);
-                            --mImageViewTapCount;
-                            if(mImageViewTapCount == 2){
-                                mImageViewTapCount = 0;
-                                mOptionsView.setVisibility(View.VISIBLE);
-                                return true;
-                            }
-                            break;
-                        }
-
-                        case MotionEvent.ACTION_MOVE : {
-
-                            // don't change while the options are open
-                            if (mOptionsView.getVisibility() != View.GONE) break;
-
-                            int x = (int) event.getX();
-                            int y = (int) event.getY();
-
-                            int vWidth = view.getWidth();
-                            int vHeight = view.getHeight();
-
-                            int r = (int) (((((double) x / (double) vWidth) * 100) * 255) / 100);
-                            int b = (int) (((((double) x / (double) vHeight) * 100) * 255) / 100);
-
-                            int vHype = (int) Math.sqrt((vWidth*vWidth) + (vHeight*vHeight));
-                            int gHype = (int) Math.sqrt((x*x) + (y*y));
-
-                            int g = vHype - gHype;
-
-                            // all together now..
-                            int rgb = r;
-                            rgb = (rgb << 8) + g;
-                            rgb = (rgb << 8) + b;
-                            mColorBackground = -rgb;
-
-                            //Log.i("Touch coordinates : ",String.valueOf(x) + "x" + String.valueOf(y));
-                            //Log.i("RGB : ",String.valueOf(-rgb));
-
-                            break;
-                        }
-
+                    case MotionEvent.ACTION_DOWN: {
+                        // animating layout changes means this doesn't flash when
+                        // the two-finger tap is performed
+                        // don't show while the options are open
+                        if (mOptionsView.getVisibility() != View.GONE) break;
+                        mHelpText.setVisibility(View.VISIBLE);
+                        ++mImageViewTapCount;
+                        Log.d("M__", "MotionEvent.ACTION_DOWN " + mImageViewTapCount);
+                        break;
                     }
+
+                    case MotionEvent.ACTION_POINTER_DOWN: {
+                        ++mImageViewTapCount;
+                        break;
+                    }
+
+                    case MotionEvent.ACTION_POINTER_UP: {
+                        ++mImageViewTapCount;
+                        break;
+                    }
+
+                    case MotionEvent.ACTION_UP: {
+                        mHelpText.setVisibility(View.GONE);
+                        --mImageViewTapCount;
+                        if (mImageViewTapCount == 2) {
+                            mImageViewTapCount = 0;
+                            mOptionsView.setVisibility(View.VISIBLE);
+                            return true;
+                        }
+                        savePreferences(); // save whatever just changed
+                        break;
+                    }
+
+                    case MotionEvent.ACTION_MOVE: {
+
+                        // don't change while the options are open
+                        if (mOptionsView.getVisibility() != View.GONE) break;
+
+                        int x = (int) event.getX();
+                        int y = (int) event.getY();
+
+                        int vWidth = view.getWidth();
+                        int vHeight = view.getHeight();
+
+                        int r = (int) (((((double) x / (double) vWidth) * 100) * 255) / 100);
+                        int b = (int) (((((double) x / (double) vHeight) * 100) * 255) / 100);
+
+                        int vHype = (int) Math.sqrt((vWidth * vWidth) + (vHeight * vHeight));
+                        int gHype = (int) Math.sqrt((x * x) + (y * y));
+
+                        int g = vHype - gHype;
+
+                        // all together now..
+                        int rgb = r;
+                        rgb = (rgb << 8) + g;
+                        rgb = (rgb << 8) + b;
+                        mColorBackground = -rgb;
+
+                        //Log.i("Touch coordinates : ",String.valueOf(x) + "x" + String.valueOf(y));
+                        //Log.i("RGB : ",String.valueOf(-rgb));
+
+                        break;
+                    }
+
+                }
 
                 return true;
             }
@@ -267,10 +278,10 @@ public class MainActivity extends AppCompatActivity {
         readyMic(mic);
         mic.start();   // Initial record start before we get into a loop
 
-        handler.postDelayed(new Runnable(){
-            public void run(){
+        handler.postDelayed(new Runnable() {
+            public void run() {
 
-                if(mic == null) return;
+                if (mic == null) return;
 
                 try {
 
@@ -318,4 +329,44 @@ public class MainActivity extends AppCompatActivity {
         mic.release();
         mic = null;
     }
+
+    private void savePreferences(){
+        sharedPreferencesEditor.putInt("AMPLITUDE_VISIBLE_OFFSET", AMPLITUDE_VISIBLE_OFFSET);
+        sharedPreferencesEditor.putInt("mColorBackground", mColorBackground);
+        sharedPreferencesEditor.commit();
+    }
+
+    private void restorePreferences(){
+        AMPLITUDE_VISIBLE_OFFSET = sharedPreferences.getInt("AMPLITUDE_VISIBLE_OFFSET", AMPLITUDE_VISIBLE_OFFSET);
+        mColorBackground = sharedPreferences.getInt("mColorBackground", mColorBackground);
+    }
+
+    /**
+     * Functionally useless since it does NOTHING when the back-button is pressed.
+     * Really, what is the point.
+     * Keeping for whatever wizard induced state calls this lame duck of a method.
+     *
+     * @param savedInstanceState
+     */
+
+    @Override
+    public void onSaveInstanceState(Bundle savedInstanceState) {
+        super.onSaveInstanceState(savedInstanceState);
+        savedInstanceState.putInt("AMPLITUDE_VISIBLE_OFFSET", AMPLITUDE_VISIBLE_OFFSET);
+        savedInstanceState.putInt("mColorBackground", mColorBackground);
+    }
+
+    /**
+     * Same for this ridiculous thing.
+     *
+     * @param savedInstanceState
+     */
+
+    @Override
+    protected void onRestoreInstanceState(Bundle savedInstanceState) {
+        super.onRestoreInstanceState(savedInstanceState);
+        AMPLITUDE_VISIBLE_OFFSET = savedInstanceState.getInt("AMPLITUDE_VISIBLE_OFFSET");
+        mColorBackground = savedInstanceState.getInt("mColorBackground");
+    }
+
 }
