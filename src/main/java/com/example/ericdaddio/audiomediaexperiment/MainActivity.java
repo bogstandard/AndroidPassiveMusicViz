@@ -8,6 +8,7 @@ import android.graphics.Paint;
 import android.graphics.Color;
 import android.graphics.PorterDuffXfermode;
 import android.graphics.PorterDuff.Mode;
+import android.graphics.RectF;
 import android.media.MediaRecorder;
 import android.os.Handler;
 import android.support.v4.content.res.ResourcesCompat;
@@ -28,6 +29,7 @@ public class MainActivity extends AppCompatActivity {
     SharedPreferences sharedPreferences;
     SharedPreferences.Editor sharedPreferencesEditor;
 
+    private String MODE = "circle";
 
     private double MAX_AMPLITUDE = 32762; // from own testing & online reading, this is the max
     // but we'll cap it at this just to be safe.
@@ -124,7 +126,17 @@ public class MainActivity extends AppCompatActivity {
                 // subtract rather than add so we don't add to silence!
                 double radius = (((maxRadius + 100) / 100) * visibleAmplitudePercentages[i]) - Math.floor(Math.random() * 10);
 
-                mCanvas.drawCircle((int) x, halfHeight, (int) radius, mPaint);
+                switch (MODE) {
+
+                    case "circle":
+                        mCanvas.drawCircle((int) x, halfHeight, (int) radius, mPaint);
+                        break;
+
+                    case "bars":
+                        mCanvas.drawRoundRect(new RectF((int) x, (int) (halfHeight-radius), (int) (x+(maxRadius/2)), (int) (halfHeight+radius)), 6, 6, mPaint);
+                        break;
+
+                }
 
                 x += maxRadius;
 
@@ -158,6 +170,28 @@ public class MainActivity extends AppCompatActivity {
         mOptionsView.setVisibility(View.GONE);
     }
 
+    public void styleSwitcherButtonOnClick(View view) {
+
+        switch (MODE) {
+            case "circle":
+                view.setBackgroundResource(R.drawable.button_style_switcher_bars);
+                MODE = "bars";
+                break;
+
+            case "bars":
+                view.setBackgroundResource(R.drawable.button_style_switcher_circle);
+                MODE = "circle";
+                break;
+        }
+
+        savePreferences();
+        Log.i("Options", "Button clicked.");
+    }
+
+    public void optionsBackgroundOnClick(View view) {
+        mOptionsView.setVisibility(View.GONE);
+    }
+
 
     @SuppressLint("ClickableViewAccessibility")
     @Override
@@ -185,6 +219,17 @@ public class MainActivity extends AppCompatActivity {
                 R.color.colorAccent, null);
 
         restorePreferences();
+
+        switch (MODE) {
+            case "circle":
+                findViewById(R.id.styleSwitcher).setBackgroundResource(R.drawable.button_style_switcher_circle);
+                break;
+
+            case "bars":
+                findViewById(R.id.styleSwitcher).setBackgroundResource(R.drawable.button_style_switcher_bars);
+                break;
+        }
+
 
         mImageView.setOnTouchListener(new View.OnTouchListener() {
             @Override
@@ -221,6 +266,7 @@ public class MainActivity extends AppCompatActivity {
                         --mImageViewTapCount;
                         if (mImageViewTapCount == 2) {
                             mImageViewTapCount = 0;
+                            mHelpText.setVisibility(View.GONE);
                             mOptionsView.setVisibility(View.VISIBLE);
                             return true;
                         }
@@ -330,12 +376,14 @@ public class MainActivity extends AppCompatActivity {
     private void savePreferences(){
         sharedPreferencesEditor.putInt("AMPLITUDE_VISIBLE_OFFSET", AMPLITUDE_VISIBLE_OFFSET);
         sharedPreferencesEditor.putInt("mColorBackground", mColorBackground);
+        sharedPreferencesEditor.putString("MODE", MODE);
         sharedPreferencesEditor.commit();
     }
 
     private void restorePreferences(){
         AMPLITUDE_VISIBLE_OFFSET = sharedPreferences.getInt("AMPLITUDE_VISIBLE_OFFSET", AMPLITUDE_VISIBLE_OFFSET);
         mColorBackground = sharedPreferences.getInt("mColorBackground", mColorBackground);
+        MODE = sharedPreferences.getString("MODE", MODE);
     }
 
     /**
@@ -351,6 +399,7 @@ public class MainActivity extends AppCompatActivity {
         super.onSaveInstanceState(savedInstanceState);
         savedInstanceState.putInt("AMPLITUDE_VISIBLE_OFFSET", AMPLITUDE_VISIBLE_OFFSET);
         savedInstanceState.putInt("mColorBackground", mColorBackground);
+        savedInstanceState.putString("MODE", MODE);
     }
 
     /**
@@ -364,6 +413,7 @@ public class MainActivity extends AppCompatActivity {
         super.onRestoreInstanceState(savedInstanceState);
         AMPLITUDE_VISIBLE_OFFSET = savedInstanceState.getInt("AMPLITUDE_VISIBLE_OFFSET");
         mColorBackground = savedInstanceState.getInt("mColorBackground");
+        MODE = savedInstanceState.getString("MODE");
     }
 
 }

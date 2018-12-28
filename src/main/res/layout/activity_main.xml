@@ -31,56 +31,105 @@
         android:layout_width="match_parent"
         android:layout_height="match_parent"
         android:background="@color/colorOptionsBackground"
+        android:onClick="optionsBackgroundOnClick"
         android:theme="@android:style/Theme.Black.NoTitleBar.Fullscreen"
         android:visibility="gone"
         tools:context=".MainActivity">
 
-        <TextView
+        <TableLayout
             android:layout_width="match_parent"
-            android:layout_height="121dp"
-            android:gravity="center"
-            android:text="@string/options_page_header"
-            android:textColor="@color/colorAccent"
-            android:textSize="22dp" />
+            android:layout_height="match_parent">
 
-        <TableRow
-            android:layout_width="match_parent"
-            android:layout_height="match_parent"
-            android:gravity="center_vertical|center_horizontal"
-            >
+            <TableRow
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:layout_weight="1"
+                android:padding="10dp">
 
-            <Button
-                android:id="@+id/buttonChainPos0"
-                android:layout_width="157dp"
-                android:layout_height="117dp"
-                android:layout_marginRight="20dp"
-                android:background="@drawable/button_bg_stroke"
-                android:onClick="optionsButtonOnClick"
-                android:text="1"
-                android:textColor="@color/colorAccent"
-                android:textSize="32dp" />
+                <TextView
+                    android:layout_width="0dp"
+                    android:layout_height="match_parent"
+                    android:layout_weight="1"
+                    android:gravity="center"
+                    android:text="@string/options_page_header"
+                    android:textColor="@color/colorAccent"
+                    android:textSize="22dp" />
+            </TableRow>
 
-            <Button
-                android:id="@+id/buttonChainPos1"
-                android:layout_width="157dp"
-                android:layout_height="117dp"
-                android:layout_marginRight="20dp"
-                android:background="@drawable/button_bg_stroke"
-                android:onClick="optionsButtonOnClick"
-                android:text="2"
-                android:textColor="@color/colorAccent"
-                android:textSize="32dp" />
+            <TableRow
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:layout_weight="1"
+                android:gravity="center_vertical|center_horizontal"
+                android:padding="21dp">
 
-            <Button
-                android:id="@+id/buttonChainPos2"
-                android:layout_width="157dp"
-                android:layout_height="117dp"
-                android:background="@drawable/button_bg_stroke"
-                android:onClick="optionsButtonOnClick"
-                android:text="3"
-                android:textColor="@color/colorAccent"
-                android:textSize="32dp" />
-        </TableRow>
+                <Button
+                    android:id="@+id/buttonChainPos0"
+                    android:layout_width="0dp"
+                    android:layout_height="match_parent"
+                    android:layout_marginRight="20dp"
+                    android:layout_weight="1"
+                    android:background="@drawable/button_bg_stroke"
+                    android:onClick="optionsButtonOnClick"
+                    android:text="1"
+                    android:textColor="@color/colorAccent"
+                    android:textSize="32dp" />
+
+                <Button
+                    android:id="@+id/buttonChainPos1"
+                    android:layout_width="0dp"
+                    android:layout_height="match_parent"
+                    android:layout_marginRight="20dp"
+                    android:layout_weight="1"
+                    android:background="@drawable/button_bg_stroke"
+                    android:onClick="optionsButtonOnClick"
+                    android:text="2"
+                    android:textColor="@color/colorAccent"
+                    android:textSize="32dp" />
+
+                <Button
+                    android:id="@+id/buttonChainPos2"
+                    android:layout_width="0dp"
+                    android:layout_height="match_parent"
+                    android:layout_weight="1"
+                    android:background="@drawable/button_bg_stroke"
+                    android:onClick="optionsButtonOnClick"
+                    android:text="3"
+                    android:textColor="@color/colorAccent"
+                    android:textSize="32dp" />
+
+            </TableRow>
+
+            <TableRow
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:layout_weight="1"
+                android:padding="21dp">
+
+                <Space
+                    android:layout_width="0dp"
+                    android:layout_height="match_parent"
+                    android:layout_weight="1" />
+
+                <Space
+                    android:layout_width="0dp"
+                    android:layout_height="match_parent"
+                    android:layout_weight="1" />
+
+                <Button
+                    android:id="@+id/styleSwitcher"
+                    android:layout_width="0dp"
+                    android:layout_height="match_parent"
+                    android:layout_weight="1"
+                    android:background="@drawable/button_style_switcher_circle"
+                    android:onClick="styleSwitcherButtonOnClick"
+                    android:text="style"
+                    android:textColor="@color/colorAccent"
+                    android:textSize="32dp" />
+
+            </TableRow>
+
+        </TableLayout>
 
     </android.support.constraint.ConstraintLayout>
 

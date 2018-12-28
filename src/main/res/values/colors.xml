@@ -11,5 +11,6 @@
 
     <!-- For Options -->
     <color name="colorOptionsBackground">#70000000</color>
+    <color name="colorStyleButtonBackground">#60FFFFFF</color>
 
 </resources>
