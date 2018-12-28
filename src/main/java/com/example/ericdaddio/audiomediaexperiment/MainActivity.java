@@ -1,7 +1,9 @@
 package com.example.ericdaddio.audiomediaexperiment;
 
 import android.annotation.SuppressLint;
+import android.content.Context;
 import android.content.SharedPreferences;
+import android.content.pm.PackageManager;
 import android.graphics.Bitmap;
 import android.graphics.Canvas;
 import android.graphics.Paint;
@@ -11,6 +13,9 @@ import android.graphics.PorterDuff.Mode;
 import android.graphics.RectF;
 import android.media.MediaRecorder;
 import android.os.Handler;
+import android.support.annotation.NonNull;
+import android.support.v4.app.ActivityCompat;
+import android.support.v4.content.ContextCompat;
 import android.support.v4.content.res.ResourcesCompat;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
@@ -21,9 +26,17 @@ import android.widget.ImageView;
 import java.lang.Math;
 
 import java.io.IOException;
+import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.List;
+
+import android.Manifest;
+import android.widget.TextView;
+import android.widget.Toast;
 
 public class MainActivity extends AppCompatActivity {
+
+    private boolean INITIALIZED = false;
 
     public static final String PREFS_NAME = "PassiveAudioVizPrefs";
     SharedPreferences sharedPreferences;
@@ -59,7 +72,6 @@ public class MainActivity extends AppCompatActivity {
 
     private View mHelpText;
     private View mOptionsView;
-
 
     private MediaRecorder readyMic(MediaRecorder mic) {
         mic.setAudioSource(android.media.MediaRecorder.AudioSource.MIC);
@@ -235,6 +247,11 @@ public class MainActivity extends AppCompatActivity {
             @Override
             public boolean onTouch(View view, MotionEvent event) {
 
+                if(!INITIALIZED) {
+                    requestAudioPermissions();
+                    return true; // return early and leave the permissions text up
+                }
+
                 int action = event.getAction() & MotionEvent.ACTION_MASK;
 
                 // thanks https://stackoverflow.com/a/43362330
@@ -309,6 +326,16 @@ public class MainActivity extends AppCompatActivity {
 
         });
 
+        requestAudioPermissions(); // in turn calls initialize() dependent on result
+
+    }
+
+    private void initialize() {
+
+        INITIALIZED = true;
+
+        ((TextView) findViewById(R.id.myHelpText)).setText(getResources().getString(R.string.help));
+
         /**
          * Begin amplitude loop code
          */
@@ -362,15 +389,70 @@ public class MainActivity extends AppCompatActivity {
                 handler.postDelayed(this, delay);
             }
         }, delay);
-
     }
+
+    //Requesting run-time permissions
+
+    //Create placeholder for user's consent to record_audio permission.
+    //This will be used in handling callback
+    private final int MY_PERMISSIONS_RECORD_AUDIO = 1;
+
+    private void requestAudioPermissions() {
+        if (ContextCompat.checkSelfPermission(this,
+                Manifest.permission.RECORD_AUDIO)
+                != PackageManager.PERMISSION_GRANTED) {
+
+            //When permission is not granted by user, show them message why this permission is needed.
+            if (ActivityCompat.shouldShowRequestPermissionRationale(this,
+                    Manifest.permission.RECORD_AUDIO)) {
+
+                //Give user option to still opt-in the permissions
+                ActivityCompat.requestPermissions(this,
+                        new String[]{Manifest.permission.RECORD_AUDIO},
+                        MY_PERMISSIONS_RECORD_AUDIO);
+
+            } else {
+                // Show user dialog to grant permission to record audio
+                ActivityCompat.requestPermissions(this,
+                        new String[]{Manifest.permission.RECORD_AUDIO},
+                        MY_PERMISSIONS_RECORD_AUDIO);
+            }
+        }
+        //If permission is granted, then go ahead recording audio
+        else if (ContextCompat.checkSelfPermission(this,
+                Manifest.permission.RECORD_AUDIO)
+                == PackageManager.PERMISSION_GRANTED) {
+
+            //Go ahead with recording audio now
+            initialize();
+        }
+    }
+
+    //Handling callback
+    @Override
+    public void onRequestPermissionsResult(int requestCode,
+                                           String permissions[], int[] grantResults) {
+        switch (requestCode) {
+            case MY_PERMISSIONS_RECORD_AUDIO: {
+                if (grantResults.length > 0
+                        && grantResults[0] == PackageManager.PERMISSION_GRANTED) {
+                    // permission was granted, yay!
+                    initialize();
+                }
+                return;
+            }
+        }
+    }
+
 
     @Override
     protected void onDestroy() {
         super.onDestroy();
-        mic.reset();
-        mic.release();
-        mic = null;
+        if(mic != null) {
+            mic.reset();
+            mic.release();
+            mic = null;
+        }
     }
 
     private void savePreferences(){
@@ -384,32 +466,6 @@ public class MainActivity extends AppCompatActivity {
         AMPLITUDE_VISIBLE_OFFSET = sharedPreferences.getInt("AMPLITUDE_VISIBLE_OFFSET", AMPLITUDE_VISIBLE_OFFSET);
         mColorBackground = sharedPreferences.getInt("mColorBackground", mColorBackground);
         MODE = sharedPreferences.getString("MODE", MODE);
-    }
-
-    /**
-     * Functionally useless since it does NOTHING when the back-button is pressed.
-     * Really, what is the point.
-     * Keeping for whatever wizard induced state calls this lame duck of a method.
-     *
-     * @param savedInstanceState
-     */
-
-    @Override
-    public void onSaveInstanceState(Bundle savedInstanceState) {
-        super.onSaveInstanceState(savedInstanceState);
-        savePreferences();
-    }
-
-    /**
-     * Same for this ridiculous thing.
-     *
-     * @param savedInstanceState
-     */
-
-    @Override
-    protected void onRestoreInstanceState(Bundle savedInstanceState) {
-        super.onRestoreInstanceState(savedInstanceState);
-        restorePreferences();
     }
 
 }

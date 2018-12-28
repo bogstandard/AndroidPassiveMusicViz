@@ -12,14 +12,15 @@
     <ImageView
         android:id="@+id/myimageview"
         android:layout_width="match_parent"
-        android:layout_height="match_parent"/>
+        android:layout_height="match_parent"
+        android:background="@color/colorBackground" />
 
     <TextView
         android:id="@+id/myHelpText"
         android:layout_width="match_parent"
         android:layout_height="121dp"
         android:gravity="center"
-        android:text="@string/help"
+        android:text="@string/permissionsHelp"
         android:textAlignment="center"
         android:textColor="@color/colorAccent"
         android:textSize="22dp" />
