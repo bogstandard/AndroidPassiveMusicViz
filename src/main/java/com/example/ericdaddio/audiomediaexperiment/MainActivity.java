@@ -253,9 +253,6 @@ public class MainActivity extends AppCompatActivity {
                         rgb = (rgb << 8) + b;
                         mColorBackground = -rgb;
 
-                        //Log.i("Touch coordinates : ",String.valueOf(x) + "x" + String.valueOf(y));
-                        //Log.i("RGB : ",String.valueOf(-rgb));
-
                         break;
                     }
 
