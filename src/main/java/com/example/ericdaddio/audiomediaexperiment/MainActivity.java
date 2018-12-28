@@ -397,9 +397,7 @@ public class MainActivity extends AppCompatActivity {
     @Override
     public void onSaveInstanceState(Bundle savedInstanceState) {
         super.onSaveInstanceState(savedInstanceState);
-        savedInstanceState.putInt("AMPLITUDE_VISIBLE_OFFSET", AMPLITUDE_VISIBLE_OFFSET);
-        savedInstanceState.putInt("mColorBackground", mColorBackground);
-        savedInstanceState.putString("MODE", MODE);
+        savePreferences();
     }
 
     /**
@@ -411,9 +409,7 @@ public class MainActivity extends AppCompatActivity {
     @Override
     protected void onRestoreInstanceState(Bundle savedInstanceState) {
         super.onRestoreInstanceState(savedInstanceState);
-        AMPLITUDE_VISIBLE_OFFSET = savedInstanceState.getInt("AMPLITUDE_VISIBLE_OFFSET");
-        mColorBackground = savedInstanceState.getInt("mColorBackground");
-        MODE = savedInstanceState.getString("MODE");
+        restorePreferences();
     }
 
 }
