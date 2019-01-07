@@ -4,7 +4,6 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:theme="@android:style/Theme.Black.NoTitleBar.Fullscreen"
     tools:context=".MainActivity"
     android:animateLayoutChanges="true">
     <!-- android:animateLayoutChanges means there's a slight fade delay on visibility changes -->
@@ -33,7 +32,6 @@
         android:layout_height="match_parent"
         android:background="@color/colorOptionsBackground"
         android:onClick="optionsBackgroundOnClick"
-        android:theme="@android:style/Theme.Black.NoTitleBar.Fullscreen"
         android:visibility="gone"
         tools:context=".MainActivity">
 
