@@ -11,8 +11,10 @@ import android.graphics.Color;
 import android.graphics.PorterDuffXfermode;
 import android.graphics.PorterDuff.Mode;
 import android.graphics.RectF;
+import android.media.AudioManager;
 import android.media.MediaRecorder;
 import android.os.Handler;
+import android.os.PowerManager;
 import android.support.annotation.NonNull;
 import android.support.v4.app.ActivityCompat;
 import android.support.v4.content.ContextCompat;
@@ -22,6 +24,7 @@ import android.os.Bundle;
 import android.util.Log;
 import android.view.MotionEvent;
 import android.view.View;
+import android.view.WindowManager;
 import android.widget.ImageView;
 import java.lang.Math;
 
@@ -42,7 +45,7 @@ public class MainActivity extends AppCompatActivity {
     SharedPreferences sharedPreferences;
     SharedPreferences.Editor sharedPreferencesEditor;
 
-    private String MODE = "circle";
+    private String MODE = "bars";
 
     private double MAX_AMPLITUDE = 32762; // from own testing & online reading, this is the max
     // but we'll cap it at this just to be safe.
@@ -74,10 +77,10 @@ public class MainActivity extends AppCompatActivity {
     private View mOptionsView;
 
     private MediaRecorder readyMic(MediaRecorder mic) {
-        mic.setAudioSource(android.media.MediaRecorder.AudioSource.MIC);
+        mic.setAudioSource(MediaRecorder.AudioSource.MIC);
         mic.setOutputFormat(MediaRecorder.OutputFormat.THREE_GPP);
         mic.setAudioEncoder(MediaRecorder.AudioEncoder.AAC_ELD); // greater sensitivity with ACC
-        mic.setMaxDuration(5000);
+        //mic.setMaxDuration(5000);
         mic.setOutputFile("/dev/null"); // we don't actually want to save, but this is required :(
 
         try {
@@ -209,6 +212,26 @@ public class MainActivity extends AppCompatActivity {
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+
+        // doing it via the layout on older phones causes confusion becuase its a sub-layout
+        // the method cannot be found normally because it looks elsewhere!
+        //findViewById(R.id.myOptionsLayout).setOnClickListener(new View.OnClickListener() {
+        //    @Override
+        //    public void onClick(View v) {
+        //        optionsButtonOnClick(v);
+        //    }
+        //});
+
+
+        // keep awake script
+
+        // for newer phones
+        getWindow().addFlags(WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON);
+
+        // for older phones
+        PowerManager powerManager = (PowerManager)this.getSystemService(Context.POWER_SERVICE);
+        PowerManager.WakeLock wakeLock = powerManager.newWakeLock(PowerManager.FULL_WAKE_LOCK, "My Lock");
+        wakeLock.acquire();
 
         sharedPreferences = getApplicationContext().getSharedPreferences(PREFS_NAME, MODE_PRIVATE);
         sharedPreferencesEditor = sharedPreferences.edit();

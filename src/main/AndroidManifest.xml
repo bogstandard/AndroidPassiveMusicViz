@@ -3,6 +3,9 @@
     package="com.example.ericdaddio.audiomediaexperiment">
 
     <uses-permission android:name="android.permission.RECORD_AUDIO" />
+    <uses-permission android:name="android.permission.WAKE_LOCK" />
+    <uses-permission android:name="android.permission.DISABLE_KEYGUARD"/>
+
 
     <application
         android:allowBackup="true"
