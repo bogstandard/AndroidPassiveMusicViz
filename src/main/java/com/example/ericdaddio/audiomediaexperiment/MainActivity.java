@@ -1,7 +1,6 @@
 package com.example.ericdaddio.audiomediaexperiment;
 
 import android.annotation.SuppressLint;
-import android.content.Context;
 import android.content.pm.PackageManager;
 import android.graphics.Bitmap;
 import android.graphics.Canvas;
@@ -12,7 +11,6 @@ import android.graphics.PorterDuff.Mode;
 import android.graphics.RectF;
 import android.media.MediaRecorder;
 import android.os.Handler;
-import android.os.PowerManager;
 import android.support.v4.app.ActivityCompat;
 import android.support.v4.content.ContextCompat;
 import android.support.v4.content.res.ResourcesCompat;
@@ -21,7 +19,6 @@ import android.os.Bundle;
 import android.util.Log;
 import android.view.MotionEvent;
 import android.view.View;
-import android.view.WindowManager;
 import android.widget.ImageView;
 import java.lang.Math;
 
@@ -66,6 +63,7 @@ public class MainActivity extends AppCompatActivity {
     private View mOptionsView;
 
     private MainActivity thisInstance;
+    private CaffeinationManager caffeinationManager;
     private PreferenceManager preferenceManager;
 
 
@@ -215,20 +213,9 @@ public class MainActivity extends AppCompatActivity {
         //    }
         //});
 
-        thisInstance = this;
-
-        // keep awake script
-
-        // for newer phones
-        getWindow().addFlags(WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON);
-
-        // for older phones
-        PowerManager powerManager = (PowerManager)this.getSystemService(Context.POWER_SERVICE);
-        PowerManager.WakeLock wakeLock = powerManager.newWakeLock(PowerManager.FULL_WAKE_LOCK, "My Lock");
-        wakeLock.acquire();
-
+        thisInstance = this; // proxy'd to prevent confusion in other scopes
+        caffeinationManager = new CaffeinationManager(thisInstance);
         preferenceManager = new PreferenceManager(thisInstance);
-
 
         setContentView(R.layout.activity_main);
 
