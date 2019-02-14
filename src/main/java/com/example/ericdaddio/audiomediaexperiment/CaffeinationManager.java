@@ -15,7 +15,8 @@ public class CaffeinationManager {
 
         // for older phones
         PowerManager powerManager = (PowerManager)activity.getSystemService(Context.POWER_SERVICE);
-        PowerManager.WakeLock wakeLock = powerManager.newWakeLock(PowerManager.FULL_WAKE_LOCK, "My Lock");
+        PowerManager.WakeLock wakeLock = powerManager.newWakeLock(PowerManager.FULL_WAKE_LOCK,
+                "PassiveAudioVizPrefs:CaffeinationManager");
         wakeLock.acquire();
 
     }
