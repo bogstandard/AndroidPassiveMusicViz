@@ -324,7 +324,6 @@ public class MainActivity extends AppCompatActivity {
         /**
          * Begin amplitude loop code
          */
-
         final Handler handler = new Handler();
         final int delay = TICK_FREQUENCY_MS; //milliseconds
         mic = new MediaRecorder();
