@@ -17,7 +17,6 @@ import android.support.v4.content.res.ResourcesCompat;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.util.Log;
-import android.view.MotionEvent;
 import android.view.View;
 import android.widget.ImageView;
 import java.lang.Math;
@@ -28,7 +27,7 @@ import android.widget.TextView;
 
 public class MainActivity extends AppCompatActivity {
 
-    private boolean INITIALIZED = false;
+    protected boolean INITIALIZED = false;
 
     public String MODE = "bars";
 
@@ -55,15 +54,16 @@ public class MainActivity extends AppCompatActivity {
     private Bitmap mBitmap;
     public int mColorBackground;
     private int mColorAccent;
-    private int mImageViewTapCount = 0;
+    protected int mImageViewTapCount = 0;
 
-    private View mHelpText;
-    private View mOptionsView;
+    protected View mHelpText;
+    protected View mOptionsView;
 
-    final private MainActivity thisInstance = this;
+    final protected MainActivity thisInstance = this;
     private CaffeinationManager caffeinationManager;
-    private PreferenceManager preferenceManager;
+    protected PreferenceManager preferenceManager;
     private MicrophoneManager microphoneManager;
+    private VisualsManager visualsManager;
 
     public void drawAmplitudes(View view) {
 
@@ -197,6 +197,7 @@ public class MainActivity extends AppCompatActivity {
         caffeinationManager = new CaffeinationManager(thisInstance);
         preferenceManager = new PreferenceManager(thisInstance);
         microphoneManager = new MicrophoneManager();
+        visualsManager = new VisualsManager();
 
         setContentView(R.layout.activity_main);
 
@@ -227,89 +228,7 @@ public class MainActivity extends AppCompatActivity {
                 break;
         }
 
-
-        mImageView.setOnTouchListener(new View.OnTouchListener() {
-            @Override
-            public boolean onTouch(View view, MotionEvent event) {
-
-                if(!INITIALIZED) {
-                    requestAudioPermissions();
-                    return true; // return early and leave the permissions text up
-                }
-
-                int action = event.getAction() & MotionEvent.ACTION_MASK;
-
-                // thanks https://stackoverflow.com/a/43362330
-                switch (action) {
-
-                    case MotionEvent.ACTION_DOWN: {
-                        // animating layout changes means this doesn't flash when
-                        // the two-finger tap is performed
-                        // don't show while the options are open
-                        if (mOptionsView.getVisibility() != View.GONE) break;
-                        mHelpText.setVisibility(View.VISIBLE);
-                        ++mImageViewTapCount;
-                        Log.d("M__", "MotionEvent.ACTION_DOWN " + mImageViewTapCount);
-                        break;
-                    }
-
-                    case MotionEvent.ACTION_POINTER_DOWN: {
-                        ++mImageViewTapCount;
-                        break;
-                    }
-
-                    case MotionEvent.ACTION_POINTER_UP: {
-                        ++mImageViewTapCount;
-                        break;
-                    }
-
-                    case MotionEvent.ACTION_UP: {
-                        mHelpText.setVisibility(View.GONE);
-                        --mImageViewTapCount;
-                        if (mImageViewTapCount == 2) {
-                            mImageViewTapCount = 0;
-                            mHelpText.setVisibility(View.GONE);
-                            mOptionsView.setVisibility(View.VISIBLE);
-                            return true;
-                        }
-                        preferenceManager.savePreferences(thisInstance); // save whatever just changed
-                        break;
-                    }
-
-                    case MotionEvent.ACTION_MOVE: {
-
-                        // don't change while the options are open
-                        if (mOptionsView.getVisibility() != View.GONE) break;
-
-                        int x = (int) event.getX();
-                        int y = (int) event.getY();
-
-                        int vWidth = view.getWidth();
-                        int vHeight = view.getHeight();
-
-                        int r = (int) (((((double) x / (double) vWidth) * 100) * 255) / 100);
-                        int b = (int) (((((double) x / (double) vHeight) * 100) * 255) / 100);
-
-                        int vHype = (int) Math.sqrt((vWidth * vWidth) + (vHeight * vHeight));
-                        int gHype = (int) Math.sqrt((x * x) + (y * y));
-
-                        int g = vHype - gHype;
-
-                        // all together now..
-                        int rgb = r;
-                        rgb = (rgb << 8) + g;
-                        rgb = (rgb << 8) + b;
-                        mColorBackground = -rgb;
-
-                        break;
-                    }
-
-                }
-
-                return true;
-            }
-
-        });
+        visualsManager.setupMImageViewListeners(thisInstance);
 
         requestAudioPermissions(); // in turn calls initialize() dependent on result
 
@@ -341,7 +260,7 @@ public class MainActivity extends AppCompatActivity {
     //This will be used in handling callback
     private final int MY_PERMISSIONS_RECORD_AUDIO = 1;
 
-    private void requestAudioPermissions() {
+    protected void requestAudioPermissions() {
         if (ContextCompat.checkSelfPermission(this,
                 Manifest.permission.RECORD_AUDIO)
                 != PackageManager.PERMISSION_GRANTED) {
