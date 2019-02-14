@@ -21,8 +21,6 @@ import android.view.MotionEvent;
 import android.view.View;
 import android.widget.ImageView;
 import java.lang.Math;
-
-import java.io.IOException;
 import java.util.Arrays;
 
 import android.Manifest;
@@ -34,9 +32,9 @@ public class MainActivity extends AppCompatActivity {
 
     public String MODE = "bars";
 
-    private double MAX_AMPLITUDE = 32762; // from own testing & online reading, this is the max
+    protected double MAX_AMPLITUDE = 32762; // from own testing & online reading, this is the max
     // but we'll cap it at this just to be safe.
-    private MediaRecorder mic;
+    protected MediaRecorder mic;
 
     public int AMPLITUDE_ARRAY_SIZE = 12 * 3; // we have a hardcoded cap of 3 phones to chain
     public int AMPLITUDE_VISIBLE_SIZE = 12;
@@ -51,7 +49,7 @@ public class MainActivity extends AppCompatActivity {
     // content/unit-5-advanced-graphics-and-views/lesson-11-canvas/11-1a-p-create-a-simple-canvas/
     // 11-1a-p-create-a-simple-canvas.html#alreadyknow
 
-    private ImageView mImageView;
+    protected ImageView mImageView;
     private Canvas mCanvas;
     private Paint mPaint = new Paint();
     private Bitmap mBitmap;
@@ -62,27 +60,10 @@ public class MainActivity extends AppCompatActivity {
     private View mHelpText;
     private View mOptionsView;
 
-    private MainActivity thisInstance;
+    final private MainActivity thisInstance = this;
     private CaffeinationManager caffeinationManager;
     private PreferenceManager preferenceManager;
-
-
-    private MediaRecorder readyMic(MediaRecorder mic) {
-        mic.setAudioSource(MediaRecorder.AudioSource.MIC);
-        mic.setOutputFormat(MediaRecorder.OutputFormat.THREE_GPP);
-        mic.setAudioEncoder(MediaRecorder.AudioEncoder.AAC_ELD); // greater sensitivity with ACC
-        //mic.setMaxDuration(5000);
-        mic.setOutputFile("/dev/null"); // we don't actually want to save, but this is required :(
-
-        try {
-            mic.prepare();
-        } catch (IOException ioExp) {
-            Log.e("Mic Ready", "Could not prepare mic");
-        }
-
-        return mic;
-    }
-
+    private MicrophoneManager microphoneManager;
 
     public void drawAmplitudes(View view) {
 
@@ -213,9 +194,9 @@ public class MainActivity extends AppCompatActivity {
         //    }
         //});
 
-        thisInstance = this; // proxy'd to prevent confusion in other scopes
         caffeinationManager = new CaffeinationManager(thisInstance);
         preferenceManager = new PreferenceManager(thisInstance);
+        microphoneManager = new MicrophoneManager();
 
         setContentView(R.layout.activity_main);
 
@@ -346,53 +327,10 @@ public class MainActivity extends AppCompatActivity {
 
         final Handler handler = new Handler();
         final int delay = TICK_FREQUENCY_MS; //milliseconds
-
         mic = new MediaRecorder();
-
-        readyMic(mic);
+        microphoneManager.readyMic(mic);
         mic.start();   // Initial record start before we get into a loop
-
-        handler.postDelayed(new Runnable() {
-            public void run() {
-
-                if (mic == null) return;
-
-                try {
-
-                    // shift array right
-                    for (int i = (amplitudes.length - 2); i >= 0; i--) {
-                        amplitudes[i + 1] = amplitudes[i];
-                        amplitudePercentages[i + 1] = amplitudePercentages[i];
-                    }
-
-                    double amplitude = mic.getMaxAmplitude();
-
-                    if (amplitude < 0 || Double.isInfinite(amplitude)) {
-                        amplitude = 0.0;
-                    }
-
-                    // push latest amplitude onto front of array
-                    // if it exceeds the MAX_AMPLITUDE then push that instead
-                    amplitudes[0] = Math.min(amplitude, MAX_AMPLITUDE);
-
-                    double percentage = (amplitude / MAX_AMPLITUDE) * 100;
-
-                    amplitudePercentages[0] = Math.min(percentage, 100);
-
-                    //Log.i("Timeout Loop", "Fired: " + String.valueOf(amplitude) );
-                    //Log.i("Timeout Loop", "Array: " + Arrays.toString(amplitudes) );
-                    //Log.i("Timeout Loop", "%    : " + Arrays.toString(amplitudePercentages) );
-
-                    // apply to view
-                    drawAmplitudes(mImageView);
-
-                } catch (Exception exp) {
-                    Log.e("Amplitudes Loop", exp.getMessage());
-                }
-
-                handler.postDelayed(this, delay);
-            }
-        }, delay);
+        handler.postDelayed(microphoneManager.processMicTicksRunnable(thisInstance, handler, delay), delay);
     }
 
 
