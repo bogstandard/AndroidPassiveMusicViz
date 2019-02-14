@@ -2,7 +2,6 @@ package com.example.ericdaddio.audiomediaexperiment;
 
 import android.annotation.SuppressLint;
 import android.content.Context;
-import android.content.SharedPreferences;
 import android.content.pm.PackageManager;
 import android.graphics.Bitmap;
 import android.graphics.Canvas;
@@ -11,11 +10,9 @@ import android.graphics.Color;
 import android.graphics.PorterDuffXfermode;
 import android.graphics.PorterDuff.Mode;
 import android.graphics.RectF;
-import android.media.AudioManager;
 import android.media.MediaRecorder;
 import android.os.Handler;
 import android.os.PowerManager;
-import android.support.annotation.NonNull;
 import android.support.v4.app.ActivityCompat;
 import android.support.v4.content.ContextCompat;
 import android.support.v4.content.res.ResourcesCompat;
@@ -29,33 +26,25 @@ import android.widget.ImageView;
 import java.lang.Math;
 
 import java.io.IOException;
-import java.util.ArrayList;
 import java.util.Arrays;
-import java.util.List;
 
 import android.Manifest;
 import android.widget.TextView;
-import android.widget.Toast;
 
 public class MainActivity extends AppCompatActivity {
 
     private boolean INITIALIZED = false;
 
-    public static final String PREFS_NAME = "PassiveAudioVizPrefs";
-    SharedPreferences sharedPreferences;
-    SharedPreferences.Editor sharedPreferencesEditor;
-
-    private String MODE = "bars";
+    public String MODE = "bars";
 
     private double MAX_AMPLITUDE = 32762; // from own testing & online reading, this is the max
     // but we'll cap it at this just to be safe.
     private MediaRecorder mic;
 
-    private int AMPLITUDE_ARRAY_SIZE = 12 * 3; // we have a hardcoded cap of 3 phones to chain
-    private int AMPLITUDE_VISIBLE_SIZE = 12;
-    private int AMPLITUDE_VISIBLE_OFFSET = 0; // changes dependent on phone position
+    public int AMPLITUDE_ARRAY_SIZE = 12 * 3; // we have a hardcoded cap of 3 phones to chain
+    public int AMPLITUDE_VISIBLE_SIZE = 12;
+    public int AMPLITUDE_VISIBLE_OFFSET = 0; // changes dependent on phone position
     final private int TICK_FREQUENCY_MS = 50;
-
 
     final double[] amplitudes = new double[AMPLITUDE_ARRAY_SIZE];
     final double[] amplitudePercentages = new double[AMPLITUDE_ARRAY_SIZE];
@@ -69,12 +58,16 @@ public class MainActivity extends AppCompatActivity {
     private Canvas mCanvas;
     private Paint mPaint = new Paint();
     private Bitmap mBitmap;
-    private int mColorBackground;
+    public int mColorBackground;
     private int mColorAccent;
     private int mImageViewTapCount = 0;
 
     private View mHelpText;
     private View mOptionsView;
+
+    private MainActivity thisInstance;
+    private PreferenceManager preferenceManager;
+
 
     private MediaRecorder readyMic(MediaRecorder mic) {
         mic.setAudioSource(MediaRecorder.AudioSource.MIC);
@@ -199,7 +192,7 @@ public class MainActivity extends AppCompatActivity {
                 break;
         }
 
-        savePreferences();
+        preferenceManager.savePreferences(thisInstance);
         Log.i("Options", "Button clicked.");
     }
 
@@ -222,6 +215,7 @@ public class MainActivity extends AppCompatActivity {
         //    }
         //});
 
+        thisInstance = this;
 
         // keep awake script
 
@@ -233,8 +227,10 @@ public class MainActivity extends AppCompatActivity {
         PowerManager.WakeLock wakeLock = powerManager.newWakeLock(PowerManager.FULL_WAKE_LOCK, "My Lock");
         wakeLock.acquire();
 
-        sharedPreferences = getApplicationContext().getSharedPreferences(PREFS_NAME, MODE_PRIVATE);
-        sharedPreferencesEditor = sharedPreferences.edit();
+        //sharedPreferences = getApplicationContext().getSharedPreferences(PREFS_NAME, MODE_PRIVATE);
+        //sharedPreferencesEditor = sharedPreferences.edit();
+        preferenceManager = new PreferenceManager(thisInstance);
+
 
         setContentView(R.layout.activity_main);
 
@@ -253,7 +249,7 @@ public class MainActivity extends AppCompatActivity {
         mColorAccent = ResourcesCompat.getColor(getResources(),
                 R.color.colorAccent, null);
 
-        restorePreferences();
+        preferenceManager.restorePreferences(thisInstance);
 
         switch (MODE) {
             case "circle":
@@ -310,7 +306,7 @@ public class MainActivity extends AppCompatActivity {
                             mOptionsView.setVisibility(View.VISIBLE);
                             return true;
                         }
-                        savePreferences(); // save whatever just changed
+                        preferenceManager.savePreferences(thisInstance); // save whatever just changed
                         break;
                     }
 
@@ -479,19 +475,6 @@ public class MainActivity extends AppCompatActivity {
             mic.release();
             mic = null;
         }
-    }
-
-    private void savePreferences(){
-        sharedPreferencesEditor.putInt("AMPLITUDE_VISIBLE_OFFSET", AMPLITUDE_VISIBLE_OFFSET);
-        sharedPreferencesEditor.putInt("mColorBackground", mColorBackground);
-        sharedPreferencesEditor.putString("MODE", MODE);
-        sharedPreferencesEditor.commit();
-    }
-
-    private void restorePreferences(){
-        AMPLITUDE_VISIBLE_OFFSET = sharedPreferences.getInt("AMPLITUDE_VISIBLE_OFFSET", AMPLITUDE_VISIBLE_OFFSET);
-        mColorBackground = sharedPreferences.getInt("mColorBackground", mColorBackground);
-        MODE = sharedPreferences.getString("MODE", MODE);
     }
 
 }
