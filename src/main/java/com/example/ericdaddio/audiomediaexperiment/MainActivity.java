@@ -415,7 +415,7 @@ public class MainActivity extends AppCompatActivity {
     }
 
 
-    // attempted from https://github.com/ptyagicodecamp/android-recipes/blob/develop/AudioRuntimePermissions/app/src/main/java/org/pcc/audioruntimepermissions/MainActivity.java
+    // adapted from https://github.com/ptyagicodecamp/android-recipes/blob/develop/AudioRuntimePermissions/app/src/main/java/org/pcc/audioruntimepermissions/MainActivity.java
 
     //Requesting run-time permissions
 
