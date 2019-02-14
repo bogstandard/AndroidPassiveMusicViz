@@ -227,8 +227,6 @@ public class MainActivity extends AppCompatActivity {
         PowerManager.WakeLock wakeLock = powerManager.newWakeLock(PowerManager.FULL_WAKE_LOCK, "My Lock");
         wakeLock.acquire();
 
-        //sharedPreferences = getApplicationContext().getSharedPreferences(PREFS_NAME, MODE_PRIVATE);
-        //sharedPreferencesEditor = sharedPreferences.edit();
         preferenceManager = new PreferenceManager(thisInstance);
 
 
