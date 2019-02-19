@@ -5,10 +5,6 @@ import android.content.pm.PackageManager;
 import android.graphics.Bitmap;
 import android.graphics.Canvas;
 import android.graphics.Paint;
-import android.graphics.Color;
-import android.graphics.PorterDuffXfermode;
-import android.graphics.PorterDuff.Mode;
-import android.graphics.RectF;
 import android.media.MediaRecorder;
 import android.os.Handler;
 import android.support.v4.app.ActivityCompat;
@@ -19,8 +15,6 @@ import android.os.Bundle;
 import android.util.Log;
 import android.view.View;
 import android.widget.ImageView;
-import java.lang.Math;
-import java.util.Arrays;
 
 import android.Manifest;
 import android.widget.TextView;
@@ -47,98 +41,25 @@ public class MainActivity extends AppCompatActivity {
     // https://google-developer-training.gitbooks.io/android-developer-advanced-course-practicals/
     // content/unit-5-advanced-graphics-and-views/lesson-11-canvas/11-1a-p-create-a-simple-canvas/
     // 11-1a-p-create-a-simple-canvas.html#alreadyknow
-
     protected ImageView mImageView;
-    private Canvas mCanvas;
-    private Paint mPaint = new Paint();
-    private Bitmap mBitmap;
-    public int mColorBackground;
-    private int mColorAccent;
+    protected Canvas mCanvas;
+    protected Paint mPaint = new Paint();
+    protected Bitmap mBitmap;
+    protected int mColorBackground;
+    protected int mColorAccent;
     protected int mImageViewTapCount = 0;
 
     protected View mHelpText;
     protected View mOptionsView;
 
     final protected MainActivity thisInstance = this;
-    private CaffeinationManager caffeinationManager;
+    protected CaffeinationManager caffeinationManager;
     protected PreferenceManager preferenceManager;
-    private MicrophoneManager microphoneManager;
-    private VisualsManager visualsManager;
+    protected MicrophoneManager microphoneManager;
+    protected VisualsManager visualsManager;
 
-    public void drawAmplitudes(View view) {
-
-        try {
-
-            int vWidth = view.getWidth();
-            int vHeight = view.getHeight();
-            int halfHeight = vHeight / 2;
-
-            // associate bitmap with canvas
-            mBitmap = Bitmap.createBitmap(vWidth, vHeight, Bitmap.Config.ARGB_8888);
-            mCanvas = new Canvas(mBitmap);
-
-            // associate canvas with view
-            mImageView.setImageBitmap(mBitmap);
-
-            // fill canvas with background
-            mCanvas.drawColor(mColorBackground);
-
-            // draw circles
-
-            // mColorAccent is an int, we can use bit magic to pluck the colour
-            int alpha = 85;
-            int r = (mColorAccent >> 16) & 0xFF;
-            int g = (mColorAccent >> 8) & 0xFF;
-            int b = (mColorAccent >> 0) & 0xFF;
-            int argb = Color.argb(alpha, r, g, b);
-
-            // https://developer.android.com/reference/android/graphics/Xfermode
-            // https://softwyer.wordpress.com/2012/01/21/1009/
-            mPaint.setColor(argb);
-            mPaint.setAntiAlias(true);
-            mPaint.setXfermode(new PorterDuffXfermode(Mode.ADD));
-
-            double maxRadius = vWidth / AMPLITUDE_VISIBLE_SIZE;
-            double x = maxRadius;
-
-            // less than full amount to fit on screen :)
-
-            double[] visibleAmplitudePercentages = Arrays.copyOfRange(amplitudePercentages,
-                    0 + (AMPLITUDE_VISIBLE_SIZE * AMPLITUDE_VISIBLE_OFFSET),
-                    AMPLITUDE_VISIBLE_SIZE + (AMPLITUDE_VISIBLE_SIZE * AMPLITUDE_VISIBLE_OFFSET));
-
-            for (int i = 0; i < visibleAmplitudePercentages.length - 1; i++) {
-
-                // radius with artificial wobble for recurring amp
-                // subtract rather than add so we don't add to silence!
-                double radius = (((maxRadius + 100) / 100) * visibleAmplitudePercentages[i]) - Math.floor(Math.random() * 10);
-
-                switch (MODE) {
-
-                    case "circle":
-                        mCanvas.drawCircle((int) x, halfHeight, (int) radius, mPaint);
-                        break;
-
-                    case "bars":
-                        mCanvas.drawRoundRect(new RectF((int) x, (int) (halfHeight-radius), (int) (x+(maxRadius/2)), (int) (halfHeight+radius)), 6, 6, mPaint);
-                        break;
-
-                }
-
-                x += maxRadius;
-
-            }
-
-            // force system to redraw the view
-            view.invalidate();
-        } catch (Exception exp) {
-            Log.e("Drawing", exp.getMessage());
-        }
-
-    }
 
     public void optionsButtonOnClick(View view) {
-        int multiplier;
         switch (view.getId()) {
             case R.id.buttonChainPos0:
                 AMPLITUDE_VISIBLE_OFFSET = 0;

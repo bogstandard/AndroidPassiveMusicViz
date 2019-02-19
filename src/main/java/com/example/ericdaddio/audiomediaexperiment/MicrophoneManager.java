@@ -52,12 +52,8 @@ public class MicrophoneManager {
 
                         activity.amplitudePercentages[0] = Math.min(percentage, 100);
 
-                        //Log.i("Timeout Loop", "Fired: " + String.valueOf(amplitude) );
-                        //Log.i("Timeout Loop", "Array: " + Arrays.toString(amplitudes) );
-                        //Log.i("Timeout Loop", "%    : " + Arrays.toString(amplitudePercentages) );
-
                         // apply to view
-                        activity.drawAmplitudes(activity.mImageView);
+                        activity.visualsManager.drawAmplitudes(activity);
 
                     } catch (Exception exp) {
                         Log.e("Amplitudes Loop", exp.getMessage());
