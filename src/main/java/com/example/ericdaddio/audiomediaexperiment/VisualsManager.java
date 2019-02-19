@@ -155,7 +155,9 @@ public class VisualsManager {
 
                 // radius with artificial wobble for recurring amp
                 // subtract rather than add so we don't add to silence!
-                double radius = (((maxRadius + 100) / 100) * visibleAmplitudePercentages[i]) - Math.floor(Math.random() * 10);
+                double radius = ((maxRadius + 100) / 100) * visibleAmplitudePercentages[i];
+                radius = radius > 10 ? radius + 50 : radius ; // artificially boost it a little
+                radius = (radius - Math.floor(Math.random() * 10));
 
                 switch (activity.MODE) {
 
