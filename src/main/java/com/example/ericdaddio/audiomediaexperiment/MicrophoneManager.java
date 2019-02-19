@@ -9,10 +9,10 @@ import java.io.IOException;
 public class MicrophoneManager {
 
     public static void readyMic(MediaRecorder mic) {
-        mic.setAudioSource(MediaRecorder.AudioSource.MIC);
+        mic.setAudioSource(MediaRecorder.AudioSource.CAMCORDER);
         mic.setOutputFormat(MediaRecorder.OutputFormat.THREE_GPP);
         mic.setAudioEncoder(MediaRecorder.AudioEncoder.AAC_ELD); // greater sensitivity with ACC
-        mic.setMaxDuration(5000); // this needs further testing.., does it limit the file saved in null?
+        //mic.setMaxDuration(5000); // this needs further testing.., does it limit the file saved in null?
         mic.setOutputFile("/dev/null"); // we don't actually want to save, but this is required :(
 
         try {
