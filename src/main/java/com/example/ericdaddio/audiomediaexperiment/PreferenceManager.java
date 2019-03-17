@@ -13,14 +13,14 @@ public class PreferenceManager {
         sharedPreferencesEditor = sharedPreferences.edit();
     }
 
-    public void savePreferences(MainActivity activity){
+    public void savePreferences(MainActivity activity) {
         sharedPreferencesEditor.putInt("AMPLITUDE_VISIBLE_OFFSET", activity.AMPLITUDE_VISIBLE_OFFSET);
         sharedPreferencesEditor.putInt("mColorBackground", activity.mColorBackground);
         sharedPreferencesEditor.putString("MODE", activity.MODE);
         sharedPreferencesEditor.commit();
     }
 
-    public void restorePreferences(MainActivity activity){
+    public void restorePreferences(MainActivity activity) {
         activity.AMPLITUDE_VISIBLE_OFFSET = sharedPreferences.getInt("AMPLITUDE_VISIBLE_OFFSET", activity.AMPLITUDE_VISIBLE_OFFSET);
         activity.mColorBackground = sharedPreferences.getInt("mColorBackground", activity.mColorBackground);
         activity.MODE = sharedPreferences.getString("MODE", activity.MODE);

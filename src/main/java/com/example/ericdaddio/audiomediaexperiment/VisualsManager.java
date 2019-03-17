@@ -35,7 +35,7 @@ public class VisualsManager {
     }
 
     @SuppressLint("ClickableViewAccessibility")
-    public static void setupMImageViewListeners(final MainActivity activity){
+    protected static void setupMImageViewListeners(final MainActivity activity){
 
         activity.mImageView.setOnTouchListener(new View.OnTouchListener() {
             @Override
@@ -109,7 +109,7 @@ public class VisualsManager {
 
     }
 
-    public void drawAmplitudes(MainActivity activity) {
+    protected void drawAmplitudes(MainActivity activity) {
 
         try {
 
@@ -150,7 +150,6 @@ public class VisualsManager {
             double[] visibleAmplitudePercentages = Arrays.copyOfRange(activity.amplitudePercentages,
                     0 + (activity.AMPLITUDE_VISIBLE_SIZE * activity.AMPLITUDE_VISIBLE_OFFSET),
                     activity.AMPLITUDE_VISIBLE_SIZE + (activity.AMPLITUDE_VISIBLE_SIZE * activity.AMPLITUDE_VISIBLE_OFFSET));
-
             for (int i = 0; i < visibleAmplitudePercentages.length - 1; i++) {
 
                 // radius with artificial wobble for recurring amp

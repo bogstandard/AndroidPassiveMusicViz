@@ -23,7 +23,7 @@ public class MainActivity extends AppCompatActivity {
 
     protected boolean INITIALIZED = false;
 
-    public String MODE = "bars";
+    protected String MODE = "bars";
 
     protected double MAX_AMPLITUDE = 32762; // from own testing & online reading, this is the max
     // but we'll cap it at this just to be safe.
