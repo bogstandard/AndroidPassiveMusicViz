@@ -26,11 +26,10 @@
 ## Table of Contents
 
 * [About the Project](#about-the-project)
+  * [Rational](#rational)
+  * [Application](#application)
   * [Built With](#built-with)
-* [Getting Started](#getting-started)
-  * [Prerequisites](#prerequisites)
-  * [Installation](#installation)
-* [Usage](#usage)
+* [Build](#build)
 * [Contributing](#contributing)
 * [License](#license)
 * [Contact](#contact)
@@ -86,7 +85,7 @@ At 3 seconds [ 0, 0, 0, 4, 7, 11, 8, 4, 0, 0, 0, 0, 11, 8]
 becomes (Phone @ Position 0) [▁▁▁▂▃▅▄] (Phone @ Position 1 )[▂▁▁▁▅▄]
 ```
 
-### Build
+## Build
 
 1. Clone the repo
 2. Open in Android Studio
