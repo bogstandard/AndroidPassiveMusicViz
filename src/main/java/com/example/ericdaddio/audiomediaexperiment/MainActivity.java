@@ -106,7 +106,7 @@ public class MainActivity extends AppCompatActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
 
-        // doing it via the layout on older phones causes confusion becuase its a sub-layout
+        // doing it via the layout on older phones causes confusion because its a sub-layout
         // the method cannot be found normally because it looks elsewhere!
         //findViewById(R.id.myOptionsLayout).setOnClickListener(new View.OnClickListener() {
         //    @Override
